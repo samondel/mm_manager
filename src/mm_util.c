@@ -1236,13 +1236,21 @@ int mm_validate_table_fsize(uint8_t table_id, FILE *stream, unsigned long expect
 }
 
 #ifdef _WIN32
-char* basename(char* path) {
-    char fname[20] = { 0 };
+const char* basename(const char* path) {
+    static char fname[_MAX_FNAME + _MAX_EXT];  // 256 + 256 = 512 bytes for filename + extension
+    char ext[_MAX_EXT] = { 0 };
+    errno_t err;
 
-    _splitpath(path, NULL, NULL, fname, NULL);
+    err = _splitpath_s(path, NULL, 0, NULL, 0, fname, _MAX_FNAME, ext, _MAX_EXT);
 
-    snprintf(path, sizeof(fname), "%s", fname);
-    return path;
+    if (err != 0) {
+        /* On error, return original path */
+        return path;
+    }
+
+    /* Append extension to filename in static buffer */
+    strncat_s(fname, _MAX_FNAME + _MAX_EXT, ext, _TRUNCATE);
+    return fname;
 }
 
 errno_t localtime_r(time_t const* const sourceTime, struct tm* tmDest) {

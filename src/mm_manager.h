@@ -1446,7 +1446,7 @@ int mm_add_pcap_rec(FILE* pcapstream, int direction, mm_packet_t* pkt, uint32_t 
 int mm_close_pcap(FILE* pcapstream);
 
 #ifdef _WIN32
-char* basename(char* path);
+const char* basename(const char* path);
 errno_t localtime_r(time_t const* const sourceTime, struct tm* tmDest);
 #endif /* _WIN32 */
 
