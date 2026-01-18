@@ -129,18 +129,22 @@ int mm_connection_close(mm_connection_t* connection) {
 
     if (connection->bytestream) {
         fclose(connection->bytestream);
+        connection->bytestream = NULL;
     }
 
     if (connection->logstream) {
         fclose(connection->logstream);
+        connection->logstream = NULL;
     }
 
     if (connection->proto.pcapstream) {
         mm_close_pcap(connection->proto.pcapstream);
+        connection->proto.pcapstream = NULL;
     }
 
     if (connection->proto.send_udp) {
         mm_close_udp();
+        connection->proto.send_udp = 0;
     }
 
     return (0);
