@@ -1362,6 +1362,7 @@ typedef struct mm_context {
     uint8_t terminal_type;
     uint8_t terminal_upd_reason;
     uint8_t complete_download;
+    uint8_t force_download;
     cashbox_status_univ_t cashbox_status;
     uint8_t rating_test_mode;
     uint8_t test_mode;

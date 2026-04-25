@@ -245,7 +245,7 @@ uint8_t table_list_mtr17_intl[] = {
     0                         /* End of table list */
 };
 
-const char cmdline_options[] = "a:b:cd:e:f:hi:k:l:mn:p:qrst:uvw";
+const char cmdline_options[] = "a:b:cd:e:f:hi:k:l:mn:p:qrst:uvwx";
 
 /* Default communication parameters, may be overridden during compile. */
 #ifndef DEFAULT_BAUD_RATE
@@ -516,6 +516,10 @@ int main(int argc, char *argv[]) {
                 break;
             case 'w':   /* Don't monitor carrier detect signal from modem. */
                 mm_context->connection.proto.monitor_carrier = FALSE;
+                break;
+            case 'x':
+                fprintf(stdout, "NOTE: Tables will be downloaded for every call from a terminal.\n");
+                mm_context->force_download = TRUE;
                 break;
             case '?':
             default:
@@ -1134,6 +1138,10 @@ static int process_mm_table(mm_context_t* context, mm_table_t* table) {
             case DLOG_MT_END_DATA:
                 ppayload += sizeof(dlog_mt_end_data_t);
                 context->trans_data_in_progress = 0;
+
+                if (context->force_download) {
+                    mm_download_tables(context, terminal_id);
+                }
 
                 *pack_payload++ = DLOG_MT_END_DATA;
 
@@ -1893,7 +1901,7 @@ time_t mm_time(int test_mode, time_t *rawtime) {
 }
 
 static void mm_display_help(const char *name, FILE *stream) {
-    /* "a:b:cd:e:f:hi:k:l:mn:p:qrst:uvw" */
+    /* "a:b:cd:e:f:hi:k:l:mn:p:qrst:uvwx" */
     fprintf(stream,
         "usage: %s [-vhmq] [-f <filename>] [-i \"modem init string\"] [-l <logfile>] [-p <pcapfile>] [-a <access_code>] [-k <key_code>] [-n <ncc_number>] [-d <default_table_dir] [-t <term_table_dir>] [-u <port>]\n",
         name);
@@ -1917,6 +1925,7 @@ static void mm_display_help(const char *name, FILE *stream) {
             "\t-t <term_table_dir> - terminal-specific table directory.\n" \
             "\t-u <port> - Send packets as UDP to <port>.\n" \
             "\t-v verbose (multiple v's increase verbosity.\n" \
-            "\t-w - don't monitor the modem for carrier loss.\n");
+            "\t-w - don't monitor the modem for carrier loss.\n"\
+            "\t-x - force download of tables on all terminal calls.\n");
     return;
 }
